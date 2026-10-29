@@ -1,0 +1,8 @@
+# API anahtarı asla depoya girmesin
+gemini_key.txt
+
+__pycache__/
+*.pyc
+
+# Botun çalışırken yazdığı hata ayıklama görüntüleri
+debug_*.png
