@@ -49,6 +49,7 @@ TOPLAMA_TUSU = None                # Metin bitince yerdeki eşyaları toplama tu
 TOPLAMA_SAYISI = 2                 # Toplama tuşuna kaç kez basılsın.
 KAMERA_DONDUR_TUSU = "e"           # Metin bulunamazsa kamerayı döndürme tuşu (None = kapalı).
 ARAYUZ_KENAR_BOSLUGU = 0.08        # Ekranın alt/üst %8'ini yoksay (sohbet kutusu, barlar).
+BASLAT_TUSU = "-"                  # Başlat/duraklat tuşu.
 HATA_AYIKLAMA = False              # True ise tespitleri bir pencerede gösterir.
 UYARI_ESIK = 0.80                  # "Anket Doğrulama Soru" penceresi tespit eşiği.
 # ------------------------------------------------------------------------
@@ -178,9 +179,13 @@ class Bot:
                          if img is not None]
         from dialog_cevapla import DialogCevapla
         self.dialog = DialogCevapla()
+        from yeniden_baglan import Baglanti
+        from biyolog import Biyolog
+        self.baglanti = Baglanti()
+        self.biyolog = Biyolog()
         self.sct = mss.mss()
         self.atla = []         # takılı metinler: [[x, y, bitis_zamani], ...] (ekran koordinatı)
-        keyboard.add_hotkey("f8", self.degistir)
+        keyboard.add_hotkey(BASLAT_TUSU, self.degistir)
         keyboard.add_hotkey("f10", self.kapat)
 
     def degistir(self):
@@ -260,7 +265,7 @@ class Bot:
         time.sleep(1.0)
 
     def bekle(self, sure, bolge):
-        """Belirtilen süre bekler; F8/F10'a basılırsa ya da doğrulama penceresi çıkarsa döner."""
+        """Belirtilen süre bekler; başlat/duraklat ya da F10'a basılırsa veya doğrulama penceresi çıkarsa döner."""
         bitis = time.time() + sure
         while time.time() < bitis:
             if not self.calisiyor or self.cikis:
@@ -369,11 +374,17 @@ class Bot:
     def calistir(self):
         adlar = ", ".join(ad for ad, _ in self.sablonlar)
         print(f"Aranan metinler: {adlar}")
-        print("F8 = başlat/duraklat, F10 = çıkış")
+        print(f"'{BASLAT_TUSU}' = başlat/duraklat, F10 = çıkış")
         kirildi = None   # son metnin kırıldığı an (geçiş süresini ölçmek için)
         while not self.cikis:
             if not self.calisiyor:
                 time.sleep(0.1)
+                continue
+            if self.baglanti.kopuk_mu():
+                self.baglanti.baglan(lambda: self.calisiyor and not self.cikis)
+                continue
+            if self.biyolog.zamani_geldi():
+                self.biyolog.calistir(self.kare_al, oyun_bolgesi())
                 continue
             bolge = oyun_bolgesi()
             kare = self.kare_al(bolge)

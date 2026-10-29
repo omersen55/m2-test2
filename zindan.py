@@ -1,7 +1,7 @@
 """
 Örümcek zindanı botu.
 
-Karakteri odanın ortasındaki taşın üstüne getir, F8 ile başlat.
+Karakteri odanın ortasındaki taşın üstüne getir, "-" tuşu ile başlat.
 - Boşluk basılı tutulur (etraftaki örümceklere vurur), pelerin tuşuna düzenli basılır (mobları toplar).
 - Ölünce "Burada yeniden başla"ya tıklar, moblardan uzak bir noktaya yürür, can dolana kadar
   bekler, aynı yoldan geri yürüyerek odanın ortasına döner ve devam eder.
@@ -15,7 +15,7 @@ import time
 import cv2
 import pydirectinput
 
-from bot_ocr import UYARI_ESIK, Bot, oyun_bolgesi, tikla
+from bot_ocr import BASLAT_TUSU, UYARI_ESIK, Bot, oyun_bolgesi, tikla
 
 # ---------------------------------------------------------------- AYARLAR
 SALDIRI_TUSU = "space"             # Basılı tutulan saldırı tuşu.
@@ -112,7 +112,7 @@ class Zindan(Bot):
 
     def bekle_cevapla(self, sure, bolge):
         """Süre boyunca bekler; doğrulama gelirse cevaplayıp beklemeye devam eder.
-        F8/F10'a basılırsa False döner."""
+        Duraklatılırsa ya da F10'a basılırsa False döner."""
         bitis = time.time() + sure
         while time.time() < bitis:
             if not self.calisiyor or self.cikis:
@@ -146,12 +146,20 @@ class Zindan(Bot):
         self.merkeze_don(bolge)
 
     def calistir(self):
-        print("Karakteri odanın ortasına getir. F8 = başlat/duraklat, F10 = çıkış")
+        print(f"Karakteri odanın ortasına getir. '{BASLAT_TUSU}' = başlat/duraklat, F10 = çıkış")
         son_pelerin = 0.0
         while not self.cikis:
             if not self.calisiyor:
                 self.bosluk(False)
                 time.sleep(0.1)
+                continue
+            if self.baglanti.kopuk_mu():
+                self.bosluk(False)
+                self.baglanti.baglan(lambda: self.calisiyor and not self.cikis)
+                continue
+            if self.biyolog.zamani_geldi():
+                self.bosluk(False)
+                self.biyolog.calistir(self.kare_al, oyun_bolgesi())
                 continue
             bolge = oyun_bolgesi()
             kare = self.kare_al(bolge)
