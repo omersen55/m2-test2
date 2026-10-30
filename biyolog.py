@@ -15,7 +15,7 @@ import pydirectinput
 from yeniden_baglan import tikla
 
 # ---------------------------------------------------------------- AYARLAR
-ARALIK = 600                       # Kaç saniyede bir teslim edilsin (600 = 10 dk).
+ARALIK = 180                       # Kaç saniyede bir teslim edilsin (180 = 3 dk).
 HATA_TEKRAR = 60                   # İkon/pencere bulunamazsa kaç saniye sonra tekrar denensin.
 SABLON_KLASOR = os.path.join("templates", "biyolog")
 TAMAM_BEKLE = 2.0                  # Toplu Ver'den sonra uyarı penceresi için en fazla kaç sn beklensin.

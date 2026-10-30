@@ -56,7 +56,7 @@ class Zindan(Bot):
             return False
         gri = cv2.cvtColor(kare, cv2.COLOR_BGR2GRAY)
         skor = max(cv2.matchTemplate(gri, t, cv2.TM_CCOEFF_NORMED).max() for t in self.uyarilar)
-        if 0.5 <= skor < UYARI_ESIK and time.time() - self.son_zayif_log > 2:
+        if 0.6 <= skor < UYARI_ESIK and time.time() - self.son_zayif_log > 2:
             print(f"   (doğrulama şablonu zayıf eşleşti: {skor:.2f}, eşik {UYARI_ESIK}) -> debug_uyari.png")
             cv2.imwrite("debug_uyari.png", kare)
             self.son_zayif_log = time.time()

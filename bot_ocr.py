@@ -51,7 +51,8 @@ KAMERA_DONDUR_TUSU = "e"           # Metin bulunamazsa kamerayı döndürme tuş
 ARAYUZ_KENAR_BOSLUGU = 0.08        # Ekranın alt/üst %8'ini yoksay (sohbet kutusu, barlar).
 BASLAT_TUSU = "-"                  # Başlat/duraklat tuşu.
 HATA_AYIKLAMA = False              # True ise tespitleri bir pencerede gösterir.
-UYARI_ESIK = 0.80                  # "Anket Doğrulama Soru" penceresi tespit eşiği.
+UYARI_ESIK = 0.70                  # Doğrulama penceresi tespit eşiği. Gerçek pencere 0.76+,
+                                   # pencere olmayan ekranlar en fazla ~0.52 alıyor.
 # ------------------------------------------------------------------------
 
 pydirectinput.PAUSE = 0.02

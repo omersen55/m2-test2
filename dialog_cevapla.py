@@ -162,7 +162,7 @@ def _dialog_konumu(kare):
     gri = cv2.cvtColor(kare, cv2.COLOR_BGR2GRAY)
     sonuc = cv2.matchTemplate(gri, t, cv2.TM_CCOEFF_NORMED)
     _, skor, _, (tx, ty) = cv2.minMaxLoc(sonuc)
-    if skor < 0.75:
+    if skor < 0.65:   # botun algılama eşiğinin (UYARI_ESIK) biraz altında olmalı
         return None
     th2, tw2 = t.shape[:2]
     return tx, ty, tw2, th2
