@@ -25,8 +25,11 @@ X_OFSET = (194, 10)                # "Biyolog Sistemi" başlığının sol üst 
 
 
 class Biyolog:
-    def __init__(self):
+    def __init__(self, aktif=True):
         self.sablonlar = {}
+        self.sonraki = time.time()
+        if not aktif:
+            return
         for ad in ("ikon", "baslik", "toplu_ver", "tamam"):
             t = cv2.imread(os.path.join(SABLON_KLASOR, ad + ".png"), cv2.IMREAD_GRAYSCALE)
             if t is None:

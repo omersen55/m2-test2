@@ -12,6 +12,7 @@ import numpy as np
 import pydirectinput
 
 import oku
+import yeniden_baglan
 try:
     import pytesseract
 
@@ -98,7 +99,12 @@ def pencere_bul(parca):
 def oyun_bolgesi():
     """Oyun penceresinin istemci alanını (ekran koordinatlarında) döndürür."""
     user32 = ctypes.windll.user32
-    hwnd = pencere_bul(OYUN_PENCERE_BASLIGI) if OYUN_PENCERE_BASLIGI else user32.GetForegroundWindow()
+    if yeniden_baglan.KARAKTER:   # arayüzden karakter adı verildiyse o karakterin penceresi
+        hwnd = yeniden_baglan.oyun_penceresi()
+    elif OYUN_PENCERE_BASLIGI:
+        hwnd = pencere_bul(OYUN_PENCERE_BASLIGI)
+    else:
+        hwnd = user32.GetForegroundWindow()
     if hwnd:
         rect = ctypes.wintypes.RECT()
         user32.GetClientRect(hwnd, ctypes.byref(rect))
@@ -171,7 +177,10 @@ def tikla(bolge, x, y):
 
 
 class Bot:
-    def __init__(self):
+    def __init__(self, ayar=None, kisayol=True):
+        """ayar: {"karakter", "hesap", "biyolog", "yuzuk", "eldiven"} (arayüzden gelir).
+        kisayol: True ise '-' ve F10 tuşları burada tanımlanır (arayüz kendisi tanımlar)."""
+        ayar = ayar or {}
         self.calisiyor = False
         self.cikis = False
         self.sablonlar = sablonlari_yukle()
@@ -182,12 +191,16 @@ class Bot:
         self.dialog = DialogCevapla()
         from yeniden_baglan import Baglanti
         from biyolog import Biyolog
-        self.baglanti = Baglanti()
-        self.biyolog = Biyolog()
+        from ekipman import Ekipman
+        yeniden_baglan.ayarla(ayar.get("karakter", ""))
+        self.baglanti = Baglanti(ayar.get("hesap", ""))
+        self.biyolog = Biyolog(aktif=ayar.get("biyolog", True))
+        self.ekipman = Ekipman([ad for ad in ("yuzuk", "eldiven") if ayar.get(ad, True)])
         self.sct = mss.mss()
         self.atla = []         # takılı metinler: [[x, y, bitis_zamani], ...] (ekran koordinatı)
-        keyboard.add_hotkey(BASLAT_TUSU, self.degistir)
-        keyboard.add_hotkey("f10", self.kapat)
+        if kisayol:
+            keyboard.add_hotkey(BASLAT_TUSU, self.degistir)
+            keyboard.add_hotkey("f10", self.kapat)
 
     def degistir(self):
         self.calisiyor = not self.calisiyor
@@ -387,6 +400,8 @@ class Bot:
             if self.biyolog.zamani_geldi():
                 self.biyolog.calistir(self.kare_al, oyun_bolgesi())
                 continue
+            if self.ekipman.zamani_geldi():
+                self.ekipman.calistir(self.kare_al, oyun_bolgesi())
             bolge = oyun_bolgesi()
             kare = self.kare_al(bolge)
             if self.uyari_var(kare):

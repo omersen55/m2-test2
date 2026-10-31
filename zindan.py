@@ -38,8 +38,8 @@ KONTROL_ARALIK = 0.1               # Saldırı sırasında ekran kontrol aralı�
 
 
 class Zindan(Bot):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, ayar=None, kisayol=True):
+        super().__init__(ayar, kisayol)
         self.olum_sablon = cv2.imread(YENIDEN_BASLA_SABLON, cv2.IMREAD_GRAYSCALE)
         if self.olum_sablon is None:
             print(f"UYARI: {YENIDEN_BASLA_SABLON} yok, ölüm algılanamayacak.")
@@ -161,6 +161,8 @@ class Zindan(Bot):
                 self.bosluk(False)
                 self.biyolog.calistir(self.kare_al, oyun_bolgesi())
                 continue
+            if self.ekipman.zamani_geldi():
+                self.ekipman.calistir(self.kare_al, oyun_bolgesi(), lambda: self.bosluk(False))
             bolge = oyun_bolgesi()
             kare = self.kare_al(bolge)
             if self.uyari_var(kare):

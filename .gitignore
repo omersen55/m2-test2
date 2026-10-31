@@ -6,3 +6,7 @@ __pycache__/
 
 # Botun çalışırken yazdığı hata ayıklama görüntüleri
 debug_*.png
+
+# Arayuz ayarlari (karakter/hesap adi)
+ayarlar.json
+bot_log.txt
